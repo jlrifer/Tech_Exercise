@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.Object;
 
 /**
  * Servlet implementation class MyServlet
@@ -62,22 +63,20 @@ public class MyServlet extends HttpServlet {
 		
 		try {
 			String selectSQL = "SELECT * FROM assignment ";
-			String theUserName = "user%";
 	   		response.getWriter().println(selectSQL + "<br>");
 			  response.getWriter().println("------------------------------------------<br>");
 			  PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
-			  preparedStatement.setString(1, theUserName);
 			  ResultSet rs = preparedStatement.executeQuery();
 		 
 			while (rs.next()) {
-			  String id = rs.getString("ID");
-			  String username = rs.getString("MYUSER");
-			  String email = rs.getString("EMAIL");
-			  String phone = rs.getString("PHONE");
-			  response.getWriter().append("USER ID: " + id + ", ");
-			  response.getWriter().append("USER NAME: " + username + ", ");
-			  response.getWriter().append("USER EMAIL: " + email + ", ");
-			  response.getWriter().append("USER PHONE: " + phone + "<br>");
+			  String className = rs.getString("className");
+			  String assignmentType = rs.getString("assignemtType");
+			  String dueDate = rs.getString("dueDate");
+			  String details = rs.getString("details");
+			  response.getWriter().append("Class Name: " + className + ", ");
+			  response.getWriter().append("Assignment Type: " + assignmentType + ", ");
+			  response.getWriter().append("Due Date: " + dueDate + ", ");
+			  response.getWriter().append("Details: " + details + "<br>");
 		   }
 		} catch (SQLException e) {
 		     e.printStackTrace();
@@ -92,4 +91,80 @@ public class MyServlet extends HttpServlet {
 		doGet(request, response);
 	}
 
+	private void searchAssignment(String input){ 
+		try {
+		    Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+		    System.out.println("Where is your MySQL JDBC Driver?");
+		    e.printStackTrace();
+		    return;
+		}
+		connection = null;
+		  
+		try {
+		   connection = DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {
+		   System.out.println("Connection Failed! Check output console");
+		   e.printStackTrace();
+		   return;
+		}
+		if (connection == null) {
+		   System.out.println("Failed to make connection!");
+		}
+		
+		try {
+			String selectSQL = "select * from assignment where (className like '%of%') || (assignmentType like '%sof%') || (dueDate like '%09%') || (details like '%sof');";
+	   		response.getWriter().println(selectSQL + "<br>");
+			  response.getWriter().println("------------------------------------------<br>");
+			  PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+			  ResultSet rs = preparedStatement.executeQuery();
+		 
+			while (rs.next()) {
+			  String className = rs.getString("className");
+			  String assignmentType = rs.getString("assignemtType");
+			  String dueDate = rs.getString("dueDate");
+			  String details = rs.getString("details");
+			  response.getWriter().append("Class Name: " + className + ", ");
+			  response.getWriter().append("Assignment Type: " + assignmentType + ", ");
+			  response.getWriter().append("Due Date: " + dueDate + ", ");
+			  response.getWriter().append("Details: " + details + "<br>");
+		   }
+		} catch (SQLException e) {
+		     e.printStackTrace();
+		}
+	}
+
+	private void addAssignment(String className, String assignmentType, String dueDate, String details){ 
+		try {
+		    Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+		    System.out.println("Where is your MySQL JDBC Driver?");
+		    e.printStackTrace();
+		    return;
+		}
+		connection = null;
+		  
+		try {
+		   connection = DriverManager.getConnection(url, user, password);
+		} catch (SQLException e) {
+		   System.out.println("Connection Failed! Check output console");
+		   e.printStackTrace();
+		   return;
+		}
+		if (connection == null) {
+		   System.out.println("Failed to make connection!");
+		}
+		
+		try {
+			String selectSQL = "insert into assignment (className, assignmentType, dueDate, details) values (\"Windows Admin\", \"Homework\", \"09/30/2017\", \"Lab\");";
+	   		response.getWriter().println(selectSQL + "<br>");
+			  response.getWriter().println("------------------------------------------<br>");
+			  PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+			  preparedStatement.setString(1, theUserName);
+			  ResultSet rs = preparedStatement.executeQuery();
+			  response.getWriter().println(rs);
+		} catch (SQLException e) {
+		     e.printStackTrace();
+		}
+	}
 }
